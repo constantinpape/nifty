@@ -10,7 +10,7 @@ namespace tools{
     This pq allows to change the priorities of elements in the queue
 
     <b>\#include</b> \<nifty/tools/priority_queue.hxx\><br>
-    
+
     Namespace: nifty::tools
 */
 template<class T,class COMPARE = std::less<T> >
@@ -27,7 +27,7 @@ public:
 
 
     /// Create an empty ChangeablePriorityQueue which can contain atmost maxSize elements
-    ChangeablePriorityQueue(const std::size_t maxSize)  
+    ChangeablePriorityQueue(const std::size_t maxSize)
     : maxSize_(maxSize),
       currentSize_(0),
       heap_(maxSize_+1),
@@ -37,7 +37,7 @@ public:
         for(unsigned i = 0; i <= maxSize_; i++)
             indices_[i] = -1;
     }
-    
+
 
     void reset(){
         currentSize_ = 0 ;
@@ -46,9 +46,12 @@ public:
     }
     /// check if the PQ is empty
     bool empty() const {
-        return currentSize_ == 0;
+        // For some reason currentSize_ goes to -1 when the last item from the PQ
+        // is removed. As a (slightly hacky) fix, we check for values <= 0 here
+        // to determine if the PQ is empty.
+        return currentSize_ <= 0;
     }
- 
+
     /// clear PQ
     void clear() {
         for(int i = 0; i < currentSize_; i++)
@@ -58,21 +61,21 @@ public:
         }
         currentSize_ = 0;
     }
- 
+
     /// check if i is an index on the PQ
     bool contains(const int i) const{
         return indices_[i] != -1;
     }
- 
+
     /// return the number of elements in the PQ
     int size()const{
         return currentSize_;
     }
- 
+
 
     /** \brief Insert a index with a given priority.
 
-        If the queue contains i bevore this 
+        If the queue contains i bevore this
         call the priority of the given index will
         be changed
     */
@@ -88,19 +91,19 @@ public:
             changePriority(i,p);
         }
     }
- 
+
     /** \brief get index with top priority
     */
     const_reference top() const {
         return heap_[1];
     }
- 
+
     /**\brief get top priority
     */
     priority_type topPriority() const {
         return priorities_[heap_[1]];
     }
- 
+
     /** \brief Remove the current top element.
     */
     void pop() {
@@ -110,12 +113,12 @@ public:
         indices_[min] = -1;
         heap_[currentSize_+1] = -1;
     }
- 
+
     /// returns the value associated with index i
     priority_type priority(const value_type i) const{
         return priorities_[i];
     }
-  
+
     /// deleqte the priority associated with index i
     void deleteItem(const value_type i)   {
         int ind = indices_[i];
@@ -139,21 +142,21 @@ public:
         }
     }
 private:
-    
+
 
     void swapItems(const int i,const  int j) {
         std::swap(heap_[i],heap_[j]);
-        indices_[heap_[i]] = i; 
+        indices_[heap_[i]] = i;
         indices_[heap_[j]] = j;
     }
- 
+
     void bubbleUp(int k)    {
         while(k > 1 && _gt( priorities_[heap_[k/2]],priorities_[heap_[k]]))   {
             swapItems(k, k/2);
             k = k/2;
         }
     }
- 
+
     void bubbleDown(int k)  {
         int j;
         while(static_cast<unsigned>(2*k) <= currentSize_) {
@@ -183,10 +186,10 @@ private:
     bool _geqt(const T & a,const T & b)const{
         return !comp_(a,b);
     }
- 
+
 
     std::size_t maxSize_;
-    std::size_t currentSize_;
+    int64_t currentSize_;
     std::vector<int> heap_;
     std::vector<int> indices_;
     std::vector<T>   priorities_;
