@@ -36,11 +36,11 @@ public:
 
     typedef nifty::graph::graph_maps::MultibandNodeMap<GraphType, double> NodeFeatureMap;
 
-    
+
     typedef FloatEdgeMap                                EdgeIndicatorsType;
     typedef FloatEdgeMap                                EdgeSizesType;
     typedef FloatNodeMap                                NodeSizesType;
-   
+
 
 
     typedef EdgeContractionGraph<GraphType, SelfType>   EdgeContractionGraphType;
@@ -59,14 +59,14 @@ public:
     };
 
     template<
-        class EDGE_INDICATORS, 
-        class EDGE_SIZES, 
+        class EDGE_INDICATORS,
+        class EDGE_SIZES,
         class NODE_FEATURES,
         class NODE_SIZES
     >
-    NodeAndEdgeWeightedClusterPolicy(const GraphType &, 
-                              const EDGE_INDICATORS & , 
-                              const EDGE_SIZES & , 
+    NodeAndEdgeWeightedClusterPolicy(const GraphType &,
+                              const EDGE_INDICATORS & ,
+                              const EDGE_SIZES & ,
                               const NODE_FEATURES &,
                               const NODE_SIZES & ,
                               const SettingsType & settings = SettingsType());
@@ -76,7 +76,7 @@ public:
     bool isDone() const;
 
     // callback called by edge contraction graph
-    
+
     EdgeContractionGraphType & edgeContractionGraph();
 
 private:
@@ -101,7 +101,7 @@ public:
     const NodeSizesType & nodeSizes() const {
         return nodeSizes_;
     }
-    
+
 private:
     // INPUT
     const GraphType &   graph_;
@@ -110,7 +110,7 @@ private:
     NodeFeatureMap      nodeFeatures_;
     NodeSizesType       nodeSizes_;
     SettingsType            settings_;
-    
+
     // INTERNAL
     const uint64_t nChannels_;
     EdgeContractionGraphType edgeContractionGraph_;
@@ -158,14 +158,14 @@ NodeAndEdgeWeightedClusterPolicy(
 }
 
 template<class GRAPH, bool ENABLE_UCM>
-inline std::pair<uint64_t, double> 
+inline std::pair<uint64_t, double>
 NodeAndEdgeWeightedClusterPolicy<GRAPH, ENABLE_UCM>::
 edgeToContractNext() const {
     return std::pair<uint64_t, double>(pq_.top(),pq_.topPriority()) ;
 }
 
 template<class GRAPH, bool ENABLE_UCM>
-inline bool 
+inline bool
 NodeAndEdgeWeightedClusterPolicy<GRAPH, ENABLE_UCM>::
 isDone() const {
     if(edgeContractionGraph_.numberOfNodes() <= settings_.numberOfNodesStop)
@@ -177,7 +177,7 @@ isDone() const {
 
 
 template<class GRAPH, bool ENABLE_UCM>
-inline void 
+inline void
 NodeAndEdgeWeightedClusterPolicy<GRAPH, ENABLE_UCM>::
 initializeWeights() {
     for(const auto edge : graph_.edges())
@@ -185,7 +185,7 @@ initializeWeights() {
 }
 
 template<class GRAPH, bool ENABLE_UCM>
-inline double 
+inline double
 NodeAndEdgeWeightedClusterPolicy<GRAPH, ENABLE_UCM>::
 computeWeight(
     const uint64_t edge
@@ -201,7 +201,7 @@ computeWeight(
     const auto e = beta*fromNodes + (1.0-beta)*fromEdge;
     return e * sFac;
 }
-    
+
 
 template<class GRAPH, bool ENABLE_UCM>
 inline double 

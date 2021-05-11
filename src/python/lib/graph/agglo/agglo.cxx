@@ -19,6 +19,7 @@ namespace agglo{
     void exportGaspAgglomerativeClustering(py::module &);
     void exportDualAgglomerativeClustering(py::module &);
     void exportLiftedAgglomerativeClusteringPolicy(py::module &);
+    void exportNodeWeightedClustering(py::module &);
 }
 }
 }
@@ -39,6 +40,7 @@ PYBIND11_MODULE(_agglo, module) {
     exportGaspAgglomerativeClustering(module);
     exportDualAgglomerativeClustering(module);
     exportLiftedAgglomerativeClusteringPolicy(module);
+    exportNodeWeightedClustering(module);
 
 }
 

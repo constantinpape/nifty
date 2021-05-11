@@ -8,5 +8,6 @@ addPythonModule(
         gasp_agglomerative_clustering.cxx
         dual_agglomerative_clustering.cxx
         lifted_agglomerative_clustering.cxx
+        node_weighted_clustering.cxx
         # generalized_long_range_cluster_policy.cxx
 )
