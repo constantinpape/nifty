@@ -82,6 +82,7 @@ Accepted update rules:
  - {name: 'smooth_max', p=2.0}   # 0.0 is mean
  """
 
+
 def getNodeWeightedPolicy(graph, node_features,
                           distance='l2',
                           update_rule='mean',
@@ -90,8 +91,9 @@ def getNodeWeightedPolicy(graph, node_features,
                           size_regularizer=0.0,
                           number_of_nodes_to_stop=1,
                           delta=0.0,
-                          with_ucm=False,
-                          **kwargs):
+                          signed_weights=False,
+                          beta=0.5,
+                          with_ucm=False):
     assert distance in ('l1', 'l2', 'cosine')
     assert update_rule in ('mean', 'min', 'max')
     ucm_name = "WithUcm" if with_ucm else ""
@@ -101,7 +103,7 @@ def getNodeWeightedPolicy(graph, node_features,
     cp = getattr(__agglo, factory)
 
     node_sizes = numpy.ones(graph.numberOfNodes, dtype='float32') if node_sizes is None else node_sizes.astype('float32')
-    distance_settings = DistanceSettings(delta)
+    distance_settings = DistanceSettings(delta, signed_weights, beta)
 
     return cp(
         graph=graph, nodeFeatures=node_features,

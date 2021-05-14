@@ -105,8 +105,10 @@ namespace agglo{
 
     void exportDistanceSettings(py::module & m) {
         py::class_<merge_rules::DistanceSettings>(m, "DistanceSettings")
-            .def(py::init<double>(),
-               py::arg("delta")=0.0
+            .def(py::init<double, bool, double>(),
+               py::arg("delta")=0.0,
+               py::arg("signedWeights")=false,
+               py::arg("beta")=0.5
             )
         ;
     }

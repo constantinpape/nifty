@@ -138,34 +138,75 @@ namespace merge_rules{
         }
     };
 
-    // TODO do we implement normalisation for the distance functions?
-    // TODO do we implement casting to signed weights?
     //
     // distance function implementations
     //
     struct DistanceSettings {
         double delta{0.0};
+        bool signedWeights{false};
+        double beta{0.5};
     };
 
     class Distance {
     public:
         typedef DistanceSettings SettingsType;
 
-        Distance(const SettingsType & settings): settings_(settings){
+        Distance(const SettingsType & settings): settings_(settings),
+                                                 min_(std::numeric_limits<double>::infinity()),
+                                                 max_(0.0){
         }
 
     protected:
+        inline void updateMinMax(const double ret) const {
+            if(ret > max_) {
+                max_ = ret;
+            }
+            if(ret < min_) {
+                min_ = ret;
+            }
+        }
+
+        inline double applyDelta(double dist, const double delta) const {
+            dist = (2 * delta - dist) / (2 * delta);
+            dist = 1. - std::max(dist, 0.) * std::max(dist, 0.0);
+            return dist;
+        }
+
         inline double postprocessDistance(double dist) const {
             const double delta = settings_.delta;
+            const bool signedWeights = settings_.signedWeights;
+
+            double min = min_;
+            double max = max_;
+
             if(delta > 0.0) {
-                dist = (2 * delta - dist) / (2 * delta);
-                dist = 1. - std::max(dist, 0.) * std::max(dist, 0.0);
+                dist = applyDelta(dist, delta);
+                if(signedWeights) {
+                    min = applyDelta(min, delta);
+                    max = applyDelta(max, delta);
+                }
             }
+
+            if(signedWeights) {
+                const double eps = 1e-7;
+                dist -= min;
+                dist /= (max + eps);
+
+                const double d_min = 0.001;
+                const double d_max = 1. - d_min;
+                dist = (d_max - d_min) * dist + d_min;
+
+                const double beta = settings_.beta;
+                dist = std::log((1. - dist) / dist) + std::log((1. - beta) / beta);
+            }
+
             return dist;
         }
 
     protected:
         SettingsType settings_;
+        mutable double min_;
+        mutable double max_;
     };
 
     class L1Distance: public Distance{
@@ -180,6 +221,7 @@ namespace merge_rules{
             for(unsigned i = 0; i < nodeFeats.shape()[1]; ++i) {
                 ret += std::abs(nodeFeats(u, i) - nodeFeats(v, i));
             }
+            updateMinMax(ret);
             ret = postprocessDistance(ret);
             return ret;
         }
@@ -205,6 +247,7 @@ namespace merge_rules{
                 ret += (fU - fV) * (fU - fV);
             }
             ret = std::sqrt(ret);
+            updateMinMax(ret);
             ret = postprocessDistance(ret);
             return ret;
         }
@@ -239,6 +282,7 @@ namespace merge_rules{
             normU = std::sqrt(normU) + eps;
             normV = std::sqrt(normV) + eps;
             ret = 1. - (ret / normU / normV);
+            updateMinMax(ret);
             ret = postprocessDistance(ret);
             return ret;
         }

@@ -136,7 +136,6 @@ namespace agglo{
         nodeWeights_.merge(aliveNode, deadNode);
     }
 
-    // TODO
     template<class GRAPH, class UPDATE_RULE, class DISTANCE_FUNCTION, bool ENABLE_UCM>
     inline void
     NodeWeightedClusterPolicy<GRAPH, UPDATE_RULE, DISTANCE_FUNCTION, ENABLE_UCM>::
