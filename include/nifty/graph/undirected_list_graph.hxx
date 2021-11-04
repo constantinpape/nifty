@@ -143,11 +143,9 @@ public:
 
     void shrinkToFit(){
         edges_.shrink_to_fit();
-        #ifndef WITHIN_TRAVIS
         for(auto & nodeAdj : nodes_){
             nodeAdj.shrink_to_fit();
         }
-        #endif
     }
 
 protected:

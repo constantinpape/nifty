@@ -577,18 +577,14 @@ namespace graph{
         for(const auto u : graph_.nodes()){
             auto & dAdj = nodes_[u];
             dAdj.clear();
-            #ifndef WITHIN_TRAVIS
             const auto degree = std::distance(graph_.adjacencyBegin(u), graph_.adjacencyEnd(u));
             dAdj.reserve(degree);
-            #endif
             for(const auto adj : graph_.adjacency(u)){
                 const auto v = adj.node();
                 const auto edge = adj.edge();
                 dAdj.insert(NodeAdjacency(v, edge));
             }
-            #ifndef WITHIN_TRAVIS
             dAdj.shrink_to_fit();
-            #endif
         }
 
         

@@ -2,7 +2,6 @@
 
 export PY_BIN="$CONDA_PREFIX/bin/python"
 cmake . \
-    -DWITHIN_TRAVIS=ON \
     -DWITH_QPBO=OFF \
     -DWITH_HDF5=ON \
     -DWITH_Z5=ON \
